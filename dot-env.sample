@@ -1,0 +1,12 @@
+# Settings for the neofinger program itself
+NF_BASEDIR="."
+NF_DBNAME="usermap.db"
+NF_LOGFILE="query.log"
+
+# Settings for uscpi-tcp
+NF_PREPEND="sudo"
+# these must be numaric
+NF_RUNAS=`id`
+NF_GROUP=`id -g`
+
+NF_PORT="79"
