@@ -12,3 +12,8 @@ to .env and adjusted it Run initdb.py, and have fun!
 
 I was Bored, and making old internet gizmos work again is fun
 
+# Features
+
+* Users are mapped not by the system but by an sqlite3 database
+* Multiple randomized banners
+* Dynamic Content entities
