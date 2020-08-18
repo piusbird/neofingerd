@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # Note We're doing this using uscpi-tcp for inital testing
 # We'll add the socket stuff later
 import sqlite3
@@ -74,16 +74,19 @@ recv_query = send_stdin
 
 def send_msg(x): return sys.stdout.write(str(x))
 
+def entry():
+    logging.basicConfig(filename=LOGFILE, filemode='w',
+                        format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+    line = recv_query()
+    if line == "\r\n" or line == "\n":
+        logging.warning("Query was blank sending banner")
+        send_msg(banner_query())
+    else:
+        resp = parse_and_query(line.strip(CRLF))
+        logging.warning("Query was %s sent %s", line.strip(
+            CRLF), str(resp).strip(CRLF))
+        send_msg(resp)
+        sys.exit(0)
 
-logging.basicConfig(filename=LOGFILE, filemode='w',
-                    format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-line = recv_query()
-if line == "\r\n" or line == "\n":
-    logging.warning("Query was blank sending banner")
-    send_msg(banner_query())
-else:
-    resp = parse_and_query(line.strip(CRLF))
-    logging.warning("Query was %s sent %s", line.strip(
-        CRLF), str(resp).strip(CRLF))
-    send_msg(resp)
-sys.exit(0)
+if __name__ == '__main__':
+    entry()

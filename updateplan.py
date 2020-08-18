@@ -5,60 +5,67 @@ import sqlite3
 import random 
 import string
 import pickle
-from settings import *
+from settings import DBNAME
 from utypes import *
+import click
 
 
 sqls = """
 INSERT OR REPLACE INTO lusers (unix_name, type, data) VALUES (?,?,?) 
 """
-def type_ff():
+delete_sqls = "DELETE FROM lusers WHERE unix_name='?';"
+
+@click.group()
+def cli():
+    pass
+
+@click.command()
+@click.argument('unixname')
+@click.argument('planfile')
+def luseradd(unixname, planfile):
     db = sqlite3.connect(DBNAME)
     c = db.cursor()
-    planfile = open(sys.argv[2]).read()
+    
 
-    c.execute(sqls, (sys.argv[1], PLAINTEXT_TYPE, planfile))
+    c.execute(sqls, (unixname, PLAINTEXT_TYPE, planfile))
     db.commit()
     db.close()
-    sys.exit(0)
+    click.echo("user added!")
 
 
 def rndname(stringLength=8):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
 
-def type_b():
+@cli.command()
+@click.argument('planfile')
+def banner(planfile):
     db = sqlite3.connect(DBNAME)
     c = db.cursor()
-    planfile = open(sys.argv[1]).read()
 
     c.execute(sqls, (rndname(), BANNER_TYPE, planfile))
     db.commit()
     db.close()
-    sys.exit(0)
+    click.echo("banner will appear in rotation")
 
-def type_4c():
+@cli.command()
+@click.argument("name")
+@click.argument("cmd")
+def cgiadd(name,cmd):
     db = sqlite3.connect(DBNAME)
     c = db.cursor()
-    name = input("Name of dynamic user:")
-    print("Enter Dynamic command to use with full paths to all files\n")
-    raw = sys.stdin.readline().strip().split(' ')
+    raw = cmd.strip().split(' ')
     planfile = pickle.dumps(raw)
 
     c.execute(sqls, (name, DYN_TYPE, planfile))
     db.commit()
     db.close()
-    sys.exit(0)
+    click.echo("Please test your cgi")
             
+def luserdel(name):
+    pass
 
+
+cli.add_command(luseradd)
 if __name__ == '__main__':
-    if len(sys.argv ) == 3:
-        type_ff()
-    elif len(sys.argv) == 2:
-        type_b()
-    elif len(sys.argv) == 1:
-        type_4c()
-    else:
-        print("Error unknown invocation\n")
-        sys.exit(1)
-
+    cli()
